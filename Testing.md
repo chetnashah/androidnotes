@@ -2,11 +2,64 @@
 
 ### src/test and src/androidTest
 
-Local unit tests (`/src/test/java/`)
-Unit tests that run locally on the Java Virtual Machine (JVM). Use these tests to minimize execution time when your tests have no Android framework dependencies or when you can mock the Android framework dependencies.
+#### Local unit tests
+Located at `module-name/src/test/java/`.
 
-Instrumented tests (`/src/androidTest/java/`)
-Unit tests that run on an Android device or emulator. These tests have access to Instrumentation information, such as the Context of the app you are testing. Use these tests when your tests have Android dependencies that mock objects cannot satisfy.
+These are tests that run on your machine's local Java Virtual Machine (JVM). Use these tests to minimize execution time when your tests have no Android framework dependencies or when you can mock the Android framework dependencies.
+
+At runtime, these tests are executed against a modified version of android.jar where all final modifiers have been stripped off. This lets you use popular mocking libraries, like Mockito or Roboelectric.
+
+#### Instrumented unit tests
+
+An Unit Android Test is a test that needs an Android device or emulator but it's different from a UI test because it doesn't start any activities.
+
+Note that the unit test is placed in `/androidTest/` instead of `/test/`.
+
+You should create instrumented unit tests if your tests need access to instrumentation information (such as the target app's `Context`) or if they require the real implementation of an Android framework component (such as a `Parcelable` or `SharedPreferences object`).
+
+
+#### Instrumented/Integration tests
+Located at `module-name/src/androidTest/java/`.
+
+These are tests that run on a hardware device or emulator. These tests have access to Instrumentation APIs, give you access to information such as the Context of the app you are testing, and let you control the app under test from your test code. Use these tests when writing integration and functional UI tests to automate user interaction, or when your tests have Android dependencies that mock objects cannot satisfy.
+
+### Android JUnit Rules
+
+Android Test includes a set of JUnit rules to be used with the AndroidJUnitRunner. JUnit rules provide more flexibility and reduce the boilerplate code required in tests.
+
+`TestCase` objects like `ActivityInstrumentationTestCase2` and `ServiceTestCase` are deprecated in favor of `ActivityTestRule` or `ServiceTestRule`.
+
+#### ActivityTestRule (for setting up Activities)
+
+This rule provides functional testing of a single activity. The activity under test will be launched before each test annotated with `@Test` and before any method annotated with `@Before`. It will be terminated after the test is completed and all methods annotated with `@After` are finished. The activity under test can be accessed during your test by calling `ActivityTestRule.getActivity()`.
+
+e.g. usage
+```Java
+@RunWith(AndroidJUnit4.class)
+@LargeTest
+public class MyClassTest {
+    @Rule
+    public ActivityTestRule<MyClass> mActivityRule =
+            new ActivityTestRule(MyClass.class);
+
+    @Test
+    public void myClassMethod_ReturnsTrue() { ... }
+}
+```
+
+#### ServiceTestRule
+
+This rule provides a simplified mechanism to start up and shut down your service before and after the duration of your test. It also guarantees that the service is successfully connected when starting a service or binding to one. The service can be started or bound using one of the helper methods. It will automatically be stopped or unbound after the test completes and any methods annotated with `@After` are finished.
+
+### App APK and Test APK
+
+There are two apks installed during testing,
+1. App under test (our shipped apk)
+2. Test apk. (apk that contains our test code)
+
+### Test suites and test cases.
+
+A Test case is a single peice of test class, where as a test-suite consists of collection of test cases, which can be organized in many ways.
 
 ### Build types, build flavors and build variants
 
@@ -43,4 +96,13 @@ e.g. `src/testPaid`, `src/androidTestPaid` etc.
 Just like android combines `src/main` with `src/flavor` for a specific build flavor,
 For testing, android will combine `src/test` with `src/testFlavor`
 
-### Source-Sets and product flavors
+### Small, Medium, Large Tests
+
+* `Small`: this test doesn't interact with any file system or network.
+* `Medium`: Accesses file systems on box which is running tests.
+* `Large`: Accesses external file systems, networks, etc.
+
+Per the Android Developers blog, a small test should take < 100ms, a medium test < 2s, and a large test < 120s.
+
+
+
