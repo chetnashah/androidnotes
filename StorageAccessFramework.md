@@ -12,6 +12,10 @@ The interaction starts when an application (in this example, a photo app) fires 
 Use `ACTION_GET_CONTENT` if you want your app to simply read/import data. With this approach, the app imports a copy of the data, such as an image file.
 Use `ACTION_OPEN_DOCUMENT` if you want your app to have long term, persistent access to documents owned by a document provider. An example would be a photo-editing app that lets users edit images stored in a document provider.
 
+### Processing results
+
+After the user selects a document in the picker, `onActivityResult()` gets called. The `resultData` parameter contains the URI that points to the selected document. Extract the URI using `.getData()` on intent parameter. When you have it, you can use it to retrieve the document the user wants
+
 Central concepts:
 
 ### Documents Provider

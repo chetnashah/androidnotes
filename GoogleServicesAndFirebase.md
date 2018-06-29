@@ -80,9 +80,31 @@ In addition, Dynamic Links work across app installs: if a user opens a Dynamic L
 
 ### Firebase App indexing
 
-Kind of used with app links.
+#### App links vs Deep links
+
+When using deep links, you may see a disambiguation dialog, 
+e.g. you have deeplink for `https://myawesomeapp.com/somecontent`.
+Disambiguation dialog shows your app as well as browser as potential handlers for this deep link.
+
+With `app links`, you register ownership of links, which help you prevent you disambiguation dialog and lead you straight to the app.
+It is a two step process
+1. add deep links for the domain links
+2. verify domain with google and hence convert them to app links.
+
+In order to associate your app with your site, we will need a `assetlinks.json` file.
+
+Kind of used with app links. Great way to boost your business and
+improve discoverability. A great way to funnel search traffic back into app.
 
 Firebase App Indexing gets your app into Google Search. If users have your app installed, they can launch your app and go directly to the content they're searching for. App Indexing reengages your app users by helping them find both public and personal content right on their device, even offering query autocompletions to help them more quickly find what they need. If users don’t yet have your app, relevant queries trigger an install card for your app in Search results.
+
+Use cases:
+1. **Search results** 
+2. **Installs** - show install button along with search result.
+3. **Autocompletions** - User can see app content
+4. **Assistant**
+5. **Ad targeting**
+
 
 
 ### Firebase on Android Client
@@ -152,6 +174,7 @@ The FirebaseRecyclerAdapter binds a Query to a RecyclerView. When data is added,
 
 Helps you Store and retrieve user-generated files like images, audio, and video without server-side code
 
+https://firebase.google.com/docs/storage/android/upload-files
 
 Your files are stored in a Google Cloud Storage bucket. The files in this bucket are presented in a hierarchical structure, just like the file system on your local hard disk, or the data in the Firebase Realtime Database. By creating a reference to a file, your app gains access to it. These references can then be used to upload or download data, get or update metadata or delete the file. **A reference can either point to a specific file or to a higher level node in the hierarchy.**
 
@@ -187,6 +210,13 @@ spaceRef.getBucket();
 3. Get async task result for upload task 
 ```java
 UploadTask task = fileRef.putBytes(data, metaData)
+```
+
+Or use putFile
+```java
+Uri file = Uri.fromFile(new File("path/to/images/rivers.jpg"));
+StorageReference riversRef = storageRef.child("images/"+file.getLastPathSegment());
+uploadTask = riversRef.putFile(file);
 ```
 
 
